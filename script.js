@@ -1,4 +1,15 @@
 const tripStart = new Date("2026-04-29T00:00:00-04:00");
+const SUPABASE_URL = "https://wftyyloxcgzfrydfljrj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_vh5sFH8OcLWyxh9VBjElRw_yUUEqhIp";
+const MEMORY_BUCKET = "trip-photos";
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const MAX_IMAGE_EDGE = 1800;
+const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+const supabaseClient =
+  window.supabase && typeof window.supabase.createClient === "function"
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
 const flightData = {
   outbound: {
@@ -274,54 +285,277 @@ async function fetchWeather() {
   );
 }
 
-function handlePhotos(files) {
-  const wall = document.querySelector("#photoWall");
-  wall.innerHTML = "";
+function setStatus(selector, message, tone = "muted") {
+  const element = document.querySelector(selector);
+  if (!element) return;
+  element.textContent = message;
+  element.dataset.tone = tone;
+}
 
-  [...files].slice(0, 9).forEach((file) => {
-    if (!file.type.startsWith("image/")) return;
+function renderPhotoPlaceholder(title, text) {
+  const wall = document.querySelector("#photoWall");
+  wall.innerHTML = `
+    <article class="placeholder-photo">
+      <strong>${sanitize(title)}</strong>
+      <span>${sanitize(text)}</span>
+    </article>
+  `;
+}
+
+function formatMemoryDate(value) {
+  if (!value) return "";
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(new Date(value));
+}
+
+function safeTrim(value, fallback, maxLength) {
+  const text = value.trim() || fallback;
+  return text.slice(0, maxLength);
+}
+
+function getPhotoOwner() {
+  const photoName = document.querySelector("#photoName").value;
+  const guestName = document.querySelector("#guestName").value;
+  return safeTrim(photoName || guestName, "朋友", 40);
+}
+
+function extensionForType(type) {
+  if (type === "image/png") return "png";
+  if (type === "image/webp") return "webp";
+  return "jpg";
+}
+
+function makeUploadPath(type) {
+  const cryptoApi = window.crypto || null;
+  const id =
+    cryptoApi && typeof cryptoApi.randomUUID === "function"
+      ? cryptoApi.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return `uploads/${id}.${extensionForType(type)}`;
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      const tile = document.createElement("article");
-      tile.className = "photo-tile";
-      tile.innerHTML = `<img src="${reader.result}" alt="上传的旅途照片" />`;
-      wall.appendChild(tile);
-    });
+    reader.addEventListener("load", () => resolve(reader.result));
+    reader.addEventListener("error", () => reject(reader.error));
     reader.readAsDataURL(file);
   });
 }
 
-function getMessages() {
-  try {
-    return JSON.parse(localStorage.getItem("italyTripMessages") || "[]");
-  } catch (error) {
-    return [];
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener("load", () => resolve(image));
+    image.addEventListener("error", reject);
+    image.src = src;
+  });
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve) => {
+    canvas.toBlob(resolve, type, quality);
+  });
+}
+
+async function compressImage(file) {
+  const dataUrl = await fileToDataUrl(file);
+  const image = await loadImage(dataUrl);
+  const scale = Math.min(1, MAX_IMAGE_EDGE / Math.max(image.width, image.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(image.width * scale));
+  canvas.height = Math.max(1, Math.round(image.height * scale));
+  const context = canvas.getContext("2d");
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  let quality = 0.82;
+  let blob = await canvasToBlob(canvas, "image/jpeg", quality);
+  while (blob && blob.size > MAX_UPLOAD_BYTES && quality > 0.48) {
+    quality -= 0.1;
+    blob = await canvasToBlob(canvas, "image/jpeg", quality);
   }
+
+  if (!blob || blob.size > MAX_UPLOAD_BYTES) {
+    throw new Error("这张照片压缩后仍然超过 5MB，请换一张小一点的照片。");
+  }
+
+  return new File([blob], `${file.name.replace(/\.[^.]+$/, "") || "trip-photo"}.jpg`, {
+    type: "image/jpeg",
+    lastModified: Date.now()
+  });
 }
 
-function saveMessages(messages) {
-  localStorage.setItem("italyTripMessages", JSON.stringify(messages.slice(-8)));
+async function prepareImage(file) {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("只能上传图片文件。");
+  }
+
+  if (!SUPPORTED_IMAGE_TYPES.includes(file.type)) {
+    throw new Error("目前支持 JPG、PNG、WebP。iPhone HEIC 请先转成 JPG 再上传。");
+  }
+
+  if (file.size <= MAX_UPLOAD_BYTES) return file;
+  return compressImage(file);
 }
 
-function renderMessages() {
-  const list = document.querySelector("#messageList");
-  const messages = getMessages();
-
-  if (!messages.length) {
-    list.innerHTML = '<article><strong>还没有留言</strong><p>第一句留给出发前的期待。</p></article>';
+async function loadPhotos() {
+  if (!supabaseClient) {
+    renderPhotoPlaceholder("云端相册暂时连接不上", "请稍后刷新页面，或检查网络后再上传。");
+    setStatus("#photoStatus", "云端相册暂时连接不上。", "error");
     return;
   }
 
-  list.innerHTML = messages
+  setStatus("#photoStatus", "正在读取云端照片...", "muted");
+  const { data, error } = await supabaseClient
+    .from("trip_photos")
+    .select("id,image_path,uploader,caption,created_at")
+    .eq("approved", true)
+    .order("created_at", { ascending: false })
+    .limit(60);
+
+  if (error) {
+    renderPhotoPlaceholder("照片暂时加载失败", "稍后刷新一下，云端相册会重新同步。");
+    setStatus("#photoStatus", `照片加载失败：${error.message}`, "error");
+    return;
+  }
+
+  const wall = document.querySelector("#photoWall");
+  if (!data.length) {
+    renderPhotoPlaceholder("云端照片墙", "第一张照片留给意大利的清晨。");
+    setStatus("#photoStatus", "云端相册已连接，等待第一张照片。", "success");
+    return;
+  }
+
+  wall.innerHTML = data
+    .map((photo) => {
+      const publicUrl = supabaseClient.storage.from(MEMORY_BUCKET).getPublicUrl(photo.image_path).data.publicUrl;
+      const caption = photo.caption ? `<p>${sanitize(photo.caption)}</p>` : "";
+      return `
+        <article class="photo-tile">
+          <img src="${publicUrl}" alt="${sanitize(photo.caption || `${photo.uploader} 上传的旅途照片`)}" loading="lazy" />
+          <div class="photo-meta">
+            <strong>${sanitize(photo.uploader || "朋友")}</strong>
+            <span>${formatMemoryDate(photo.created_at)}</span>
+            ${caption}
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+  setStatus("#photoStatus", `已同步 ${data.length} 张云端照片。`, "success");
+}
+
+async function handlePhotos(files) {
+  if (!supabaseClient) {
+    setStatus("#photoStatus", "云端相册暂时连接不上，无法上传。", "error");
+    return;
+  }
+
+  const selected = [...files].filter((file) => file.type.startsWith("image/")).slice(0, 12);
+  if (!selected.length) return;
+
+  const button = document.querySelector("#uploadTrigger");
+  const input = document.querySelector("#photoInput");
+  const caption = document.querySelector("#photoCaption").value.trim().slice(0, 220);
+  const uploader = getPhotoOwner();
+  button.disabled = true;
+
+  try {
+    let uploaded = 0;
+    for (const file of selected) {
+      setStatus("#photoStatus", `正在处理 ${file.name}...`, "muted");
+      const readyFile = await prepareImage(file);
+      const path = makeUploadPath(readyFile.type);
+      const { error: uploadError } = await supabaseClient.storage.from(MEMORY_BUCKET).upload(path, readyFile, {
+        cacheControl: "31536000",
+        contentType: readyFile.type,
+        upsert: false
+      });
+      if (uploadError) throw uploadError;
+
+      const { error: insertError } = await supabaseClient.from("trip_photos").insert({
+        image_path: path,
+        uploader,
+        caption
+      });
+      if (insertError) throw insertError;
+
+      uploaded += 1;
+      setStatus("#photoStatus", `已上传 ${uploaded} / ${selected.length} 张照片...`, "success");
+    }
+
+    document.querySelector("#photoCaption").value = "";
+    await loadPhotos();
+    setStatus("#photoStatus", `上传完成，${uploaded} 张照片已经进入云端相册。`, "success");
+  } catch (error) {
+    setStatus("#photoStatus", `上传失败：${error.message}`, "error");
+  } finally {
+    input.value = "";
+    button.disabled = false;
+  }
+}
+
+async function renderMessages() {
+  const list = document.querySelector("#messageList");
+  if (!supabaseClient) {
+    list.innerHTML = '<article><strong>留言暂时连接不上</strong><p>稍后刷新页面再试一次。</p></article>';
+    setStatus("#messageStatus", "留言暂时连接不上。", "error");
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("trip_messages")
+    .select("name,text,created_at")
+    .eq("approved", true)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error) {
+    list.innerHTML = '<article><strong>留言暂时加载失败</strong><p>稍后刷新页面再试一次。</p></article>';
+    setStatus("#messageStatus", `留言加载失败：${error.message}`, "error");
+    return;
+  }
+
+  if (!data.length) {
+    list.innerHTML = '<article><strong>还没有留言</strong><p>第一句留给出发前的期待。</p></article>';
+    setStatus("#messageStatus", "云端留言已连接，等待第一条留言。", "success");
+    return;
+  }
+
+  list.innerHTML = data
     .map(
       (message) => `
         <article>
-          <strong>${message.name}</strong>
-          <p>${message.text}</p>
+          <strong>${sanitize(message.name)}</strong>
+          <span>${formatMemoryDate(message.created_at)}</span>
+          <p>${sanitize(message.text)}</p>
         </article>
       `
     )
     .join("");
+  setStatus("#messageStatus", `已同步 ${data.length} 条云端留言。`, "success");
+}
+
+async function saveCloudMessage(name, text) {
+  if (!supabaseClient) throw new Error("留言暂时连接不上。");
+  const { error } = await supabaseClient.from("trip_messages").insert({
+    name: safeTrim(name, "朋友", 40),
+    text: text.trim().slice(0, 220)
+  });
+  if (error) throw error;
+}
+
+function startMemoryRealtime() {
+  if (!supabaseClient) return;
+  supabaseClient
+    .channel("italy-memory-wall")
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "trip_photos" }, loadPhotos)
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "trip_messages" }, renderMessages)
+    .subscribe();
 }
 
 function sanitize(text) {
@@ -409,21 +643,29 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector("#uploadTrigger").addEventListener("click", () => {
     document.querySelector("#photoInput").click();
   });
-  document.querySelector("#photoInput").addEventListener("change", (event) => {
-    handlePhotos(event.target.files);
+  document.querySelector("#photoInput").addEventListener("change", async (event) => {
+    await handlePhotos(event.target.files);
   });
 
-  document.querySelector("#guestForm").addEventListener("submit", (event) => {
+  document.querySelector("#guestForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const name = sanitize(document.querySelector("#guestName").value.trim() || "朋友");
-    const text = sanitize(document.querySelector("#guestMessage").value.trim());
+    const name = document.querySelector("#guestName").value.trim() || "朋友";
+    const text = document.querySelector("#guestMessage").value.trim();
     if (!text) return;
 
-    const messages = getMessages();
-    messages.push({ name, text });
-    saveMessages(messages);
-    event.target.reset();
-    renderMessages();
+    const button = event.target.querySelector("button");
+    button.disabled = true;
+    setStatus("#messageStatus", "正在保存留言...", "muted");
+    try {
+      await saveCloudMessage(name, text);
+      event.target.reset();
+      await renderMessages();
+      setStatus("#messageStatus", "留言已经保存到云端。", "success");
+    } catch (error) {
+      setStatus("#messageStatus", `留言保存失败：${error.message}`, "error");
+    } finally {
+      button.disabled = false;
+    }
   });
 
   document.querySelector("#guideToggle").addEventListener("click", () => {
@@ -451,5 +693,7 @@ document.addEventListener("DOMContentLoaded", () => {
   switchFlight("outbound");
   renderTimeline("florence");
   renderMessages();
+  loadPhotos();
+  startMemoryRealtime();
   fetchWeather();
 });

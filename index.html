@@ -282,15 +282,29 @@
             <p class="eyebrow">Memory Wall</p>
             <h2>旅途瞬间和留言</h2>
           </div>
-          <button class="secondary-action" id="uploadTrigger" type="button">上传本机照片</button>
+          <button class="secondary-action" id="uploadTrigger" type="button">上传到云端相册</button>
           <input id="photoInput" type="file" accept="image/*" multiple hidden />
         </div>
         <div class="memory-grid">
-          <div class="photo-wall" id="photoWall">
-            <article class="placeholder-photo">
-              <strong>照片墙</strong>
-              <span>上传的照片只保存在当前浏览器，适合旅行时临时整理。</span>
-            </article>
+          <div class="album-side">
+            <div class="upload-panel" aria-label="云端相册上传设置">
+              <label>
+                上传人
+                <input id="photoName" type="text" maxlength="40" placeholder="你的名字" />
+              </label>
+              <label>
+                照片备注
+                <input id="photoCaption" type="text" maxlength="220" placeholder="一句话记录这一刻，可不填" />
+              </label>
+              <p>单张照片最多 5MB。较大的 JPG / PNG / WebP 会自动压缩后上传。</p>
+              <p class="memory-status" id="photoStatus" role="status">云端相册正在连接...</p>
+            </div>
+            <div class="photo-wall" id="photoWall">
+              <article class="placeholder-photo">
+                <strong>云端照片墙</strong>
+                <span>照片会保存在云端，刷新页面或换设备也能看到。</span>
+              </article>
+            </div>
           </div>
           <div class="guestbook">
             <h3>朋友留言</h3>
@@ -305,6 +319,7 @@
               </label>
               <button class="primary-action form-action" type="submit">保存留言</button>
             </form>
+            <p class="memory-status" id="messageStatus" role="status">留言正在同步...</p>
             <div class="message-list" id="messageList"></div>
           </div>
         </div>
@@ -337,6 +352,7 @@
       </p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
   </body>
 </html>

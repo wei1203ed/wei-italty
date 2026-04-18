@@ -44,6 +44,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: wait;
+  opacity: 0.64;
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -732,6 +737,28 @@ footer p {
   gap: 14px;
 }
 
+.album-side {
+  display: grid;
+  gap: 12px;
+}
+
+.upload-panel {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  background: #eef5ec;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.upload-panel p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .photo-wall {
   min-height: 390px;
   display: grid;
@@ -770,16 +797,43 @@ footer p {
   object-fit: cover;
 }
 
+.photo-meta {
+  min-height: 104px;
+  padding: 10px;
+  display: grid;
+  align-content: start;
+  gap: 3px;
+}
+
+.photo-meta strong {
+  font-size: 14px;
+}
+
+.photo-meta span,
+.message-list span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.photo-meta p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .guestbook {
   padding: 20px;
 }
 
-.guestbook form {
+.guestbook form,
+.upload-panel label {
   display: grid;
   gap: 12px;
 }
 
-.guestbook label {
+.guestbook label,
+.upload-panel label {
   display: grid;
   gap: 6px;
   color: var(--muted);
@@ -789,6 +843,7 @@ footer p {
 
 .guestbook input,
 .guestbook textarea,
+.upload-panel input,
 .guide-form input {
   width: 100%;
   border: 1px solid var(--line);
@@ -804,6 +859,22 @@ footer p {
 
 .form-action {
   border: 0;
+}
+
+.memory-status {
+  min-height: 22px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.memory-status[data-tone="success"] {
+  color: var(--green);
+}
+
+.memory-status[data-tone="error"] {
+  color: var(--red);
 }
 
 .message-list {
@@ -1013,6 +1084,7 @@ footer {
   .weather-grid,
   .city-cards,
   .booking-grid,
+  .upload-panel,
   .photo-wall {
     grid-template-columns: 1fr;
   }
