@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>意大利行程 | Florence Venice Rome</title>
+    <meta
+      name="description"
+      content="2026 年 4 月 29 日至 5 月 8 日，多伦多出发，经佛罗伦萨、威尼斯、罗马的意大利旅行仪表盘。"
+    />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="preconnect" href="https://api.open-meteo.com" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" id="top">
+      <nav class="nav" aria-label="主导航">
+        <a class="brand" href="#top">Italia 2026</a>
+        <div class="nav-links">
+          <a href="#dashboard">总览</a>
+          <a href="#cities">城市</a>
+          <a href="#planner">攻略</a>
+          <a href="#memory">回忆</a>
+        </div>
+        <button class="share-btn" id="shareBtn" type="button">分享</button>
+      </nav>
+
+      <section class="hero" aria-label="意大利旅行总览">
+        <p class="eyebrow">Toronto to Rome · Apr 29 - May 8</p>
+        <h1>佛罗伦萨、威尼斯、罗马</h1>
+        <p class="hero-copy">
+          从文艺复兴的清晨走到大运河的黄昏，再把最后三天留给罗马的石头、喷泉和夜风。
+        </p>
+        <div class="hero-actions" aria-label="行程重点">
+          <a class="primary-action" href="#dashboard">打开行程板</a>
+          <span class="route-pill"><span>YYZ → NYC → FCO</span><span>FLR → VCE → ROM → YYZ</span></span>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="countdown-band" id="dashboard" aria-label="倒计时">
+        <div>
+          <p class="eyebrow">Countdown</p>
+          <h2 id="countdownTitle">距离出发日</h2>
+        </div>
+        <div class="countdown-grid" id="countdown">
+          <article>
+            <strong id="days">00</strong>
+            <span>Day</span>
+          </article>
+          <article>
+            <strong id="hours">00</strong>
+            <span>Hour</span>
+          </article>
+          <article>
+            <strong id="minutes">00</strong>
+            <span>Minute</span>
+          </article>
+          <article>
+            <strong id="seconds">00</strong>
+            <span>Second</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="snapshot" aria-label="行程快照">
+        <article class="metric">
+          <span>总行程</span>
+          <strong>10 天 · 8 晚意大利</strong>
+        </article>
+        <article class="metric">
+          <span>住宿节奏</span>
+          <strong>佛罗伦萨 3 晚 · 威尼斯 2 晚 · 罗马 3 晚</strong>
+        </article>
+        <article class="metric">
+          <span>核心路线</span>
+          <strong>FCO 入境后直接火车去佛罗伦萨</strong>
+        </article>
+        <article class="metric">
+          <span>优先预订</span>
+          <strong>乌菲兹、学院、斗兽场、梵蒂冈</strong>
+        </article>
+      </section>
+
+      <section class="flight-card" aria-label="航班与城市移动">
+        <div class="flight-top">
+          <div>
+            <p class="eyebrow">Flight Board</p>
+            <h2>跨洋航线</h2>
+          </div>
+          <div class="toggle-group" aria-label="切换去程返程">
+            <button class="toggle active" type="button" data-flight="outbound">去程</button>
+            <button class="toggle" type="button" data-flight="return">返程</button>
+          </div>
+        </div>
+
+        <div class="flight-main">
+          <div>
+            <span class="board-label" id="flightLabel">Apr 29 - Apr 30</span>
+            <h3 id="flightTitle">多伦多出发，经纽约转机飞罗马</h3>
+            <p id="flightNote">
+              抵达 FCO 后直接转火车去佛罗伦萨，第一天不用硬塞罗马景点。
+            </p>
+          </div>
+          <div class="airport-line" aria-label="航线路线">
+            <span id="originCode">YYZ</span>
+            <i></i>
+            <span id="midCode">NYC</span>
+            <i></i>
+            <span id="destCode">FCO</span>
+          </div>
+        </div>
+
+        <div class="flight-progress">
+          <span>出发</span>
+          <span>转机</span>
+          <span>抵达</span>
+          <div class="progress-track"><div id="flightProgress"></div></div>
+        </div>
+      </section>
+
+      <section class="section split" aria-label="行程体验分布">
+        <div>
+          <p class="eyebrow">Trip Rhythm</p>
+          <h2>这趟行程的节奏</h2>
+          <p>
+            路线不贪多，三座城市刚好形成一个完整弧线：佛罗伦萨看艺术和屋顶，威尼斯放慢脚步，罗马留给古迹、梵蒂冈和最后一顿好饭。
+          </p>
+        </div>
+        <div class="rhythm-bars">
+          <div class="bar-row">
+            <span>文艺复兴与博物馆</span>
+            <div><i style="width: 88%"></i></div>
+          </div>
+          <div class="bar-row">
+            <span>城市慢逛与拍照</span>
+            <div><i style="width: 82%"></i></div>
+          </div>
+          <div class="bar-row">
+            <span>古罗马与宗教艺术</span>
+            <div><i style="width: 78%"></i></div>
+          </div>
+          <div class="bar-row">
+            <span>火车移动</span>
+            <div><i style="width: 46%"></i></div>
+          </div>
+          <div class="bar-row">
+            <span>咖啡、酒馆和夜景</span>
+            <div><i style="width: 74%"></i></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="route-map" aria-label="旅行路线图">
+        <div class="route-heading">
+          <div>
+            <p class="eyebrow">Route Map</p>
+            <h2>从 FCO 开始的三城路线</h2>
+          </div>
+          <a
+            class="text-link"
+            href="https://www.google.com/maps/dir/Rome+Fiumicino+Airport/Florence/Venice/Rome/"
+            target="_blank"
+            rel="noreferrer"
+            >在地图中打开</a
+          >
+        </div>
+        <div class="route-stage">
+          <article>
+            <span>01</span>
+            <strong>FCO → 佛罗伦萨</strong>
+            <p>4 月 30 日，机场到 Roma Termini 后换高铁到 Firenze SMN。</p>
+          </article>
+          <article>
+            <span>02</span>
+            <strong>佛罗伦萨 → 威尼斯</strong>
+            <p>5 月 3 日早上出发，抵达 Venezia S. Lucia 后直接进入水城节奏。</p>
+          </article>
+          <article>
+            <span>03</span>
+            <strong>威尼斯 → 罗马</strong>
+            <p>5 月 5 日早上南下，到罗马后把下午留给市中心轻松散步。</p>
+          </article>
+          <article>
+            <span>04</span>
+            <strong>罗马 → 多伦多</strong>
+            <p>5 月 8 日早上从罗马返程，经底特律转机回多伦多。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="weather-section" aria-label="实时天气">
+        <div class="section-heading">
+          <p class="eyebrow">Live Weather</p>
+          <h2>出门前看一眼天气</h2>
+          <button class="secondary-action" id="weatherRefresh" type="button">刷新天气</button>
+        </div>
+        <div class="weather-grid" id="weatherGrid"></div>
+      </section>
+
+      <section class="city-gallery" id="cities" aria-label="城市概览">
+        <div class="section-heading">
+          <p class="eyebrow">Cities</p>
+          <h2>三座城市，三种心情</h2>
+        </div>
+        <div class="city-cards">
+          <article class="city-card">
+            <img
+              src="https://images.unsplash.com/photo-1745418928142-c870e5981238?auto=format&fit=crop&w=900&q=80"
+              alt="佛罗伦萨圣母百花大教堂"
+            />
+            <div>
+              <span>Apr 30 - May 3</span>
+              <h3>佛罗伦萨</h3>
+              <p>把最想看的艺术先拿下：圣母百花大教堂、乌菲兹、学院美术馆、老桥和米开朗基罗广场。</p>
+            </div>
+          </article>
+          <article class="city-card">
+            <img
+              src="https://images.unsplash.com/photo-1741648711665-e1a8003b7891?auto=format&fit=crop&w=900&q=80"
+              alt="威尼斯大运河与圣母安康教堂"
+            />
+            <div>
+              <span>May 3 - May 5</span>
+              <h3>威尼斯</h3>
+              <p>重点不是赶景点，而是水边、桥上、小巷里慢慢走：圣马可、总督宫、里亚托桥和大运河。</p>
+            </div>
+          </article>
+          <article class="city-card">
+            <img
+              src="https://images.unsplash.com/photo-1748194380521-548ee554c378?auto=format&fit=crop&w=900&q=80"
+              alt="罗马斗兽场"
+            />
+            <div>
+              <span>May 5 - May 8</span>
+              <h3>罗马</h3>
+              <p>白天看斗兽场、古罗马广场、梵蒂冈；晚上留给万神殿、许愿池、西班牙广场和告别晚餐。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="planner-section" id="planner" aria-label="每日攻略">
+        <div class="planner-top">
+          <div>
+            <p class="eyebrow">Daily Planner</p>
+            <h2>按城市打开每日安排</h2>
+          </div>
+          <div class="tab-row" role="tablist" aria-label="城市行程">
+            <button class="city-tab active" type="button" data-city="florence">佛罗伦萨</button>
+            <button class="city-tab" type="button" data-city="venice">威尼斯</button>
+            <button class="city-tab" type="button" data-city="rome">罗马</button>
+          </div>
+        </div>
+        <div class="timeline" id="timeline"></div>
+      </section>
+
+      <section class="booking-section" aria-label="预订清单">
+        <div>
+          <p class="eyebrow">Booking Desk</p>
+          <h2>建议提前处理的票和交通</h2>
+          <p>
+            五一前后的热门城市会很满。博物馆和热门古迹尽量走官网或官方授权入口，火车票用 Trenitalia / Italo 对比时间和价格。
+          </p>
+        </div>
+        <div class="booking-grid">
+          <a href="https://tickets.duomo.firenze.it/en/" target="_blank" rel="noreferrer">Florence Duomo</a>
+          <a href="https://www.uffizi.it/en/tickets" target="_blank" rel="noreferrer">Uffizi</a>
+          <a href="https://www.galleriaaccademiafirenze.it/en/tickets/" target="_blank" rel="noreferrer">Accademia</a>
+          <a href="https://www.visitmuve.it/en/visit/tickets/" target="_blank" rel="noreferrer">Doge's Palace</a>
+          <a href="https://ticketing.colosseo.it/en" target="_blank" rel="noreferrer">Colosseum</a>
+          <a href="https://tickets.museivaticani.va/" target="_blank" rel="noreferrer">Vatican Museums</a>
+          <a href="https://www.trenitalia.com/en.html" target="_blank" rel="noreferrer">Trenitalia</a>
+          <a href="https://www.italotreno.com/en" target="_blank" rel="noreferrer">Italo</a>
+        </div>
+      </section>
+
+      <section class="memory-section" id="memory" aria-label="旅途回忆">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Memory Wall</p>
+            <h2>旅途瞬间和留言</h2>
+          </div>
+          <button class="secondary-action" id="uploadTrigger" type="button">上传本机照片</button>
+          <input id="photoInput" type="file" accept="image/*" multiple hidden />
+        </div>
+        <div class="memory-grid">
+          <div class="photo-wall" id="photoWall">
+            <article class="placeholder-photo">
+              <strong>照片墙</strong>
+              <span>上传的照片只保存在当前浏览器，适合旅行时临时整理。</span>
+            </article>
+          </div>
+          <div class="guestbook">
+            <h3>朋友留言</h3>
+            <form id="guestForm">
+              <label>
+                名字
+                <input id="guestName" type="text" maxlength="24" placeholder="你的名字" />
+              </label>
+              <label>
+                留言
+                <textarea id="guestMessage" rows="4" maxlength="180" placeholder="写一句给这趟旅行的话"></textarea>
+              </label>
+              <button class="primary-action form-action" type="submit">保存留言</button>
+            </form>
+            <div class="message-list" id="messageList"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="guide-widget" aria-label="AI 随身导游">
+      <button class="guide-fab" id="guideToggle" type="button">AI 导游</button>
+      <div class="guide-panel" id="guidePanel" aria-live="polite">
+        <div class="guide-header">
+          <div>
+            <strong>AI 随身导游</strong>
+            <span>输入城市、景点、吃饭或买票</span>
+          </div>
+          <button id="guideClose" type="button" aria-label="关闭导游">×</button>
+        </div>
+        <div class="guide-log" id="guideLog">
+          <p>你好，我已经记住这趟意大利路线。问我“罗马怎么排”“威尼斯吃什么”“买票提醒”都可以。</p>
+        </div>
+        <form class="guide-form" id="guideForm">
+          <input id="guideInput" type="text" placeholder="问一个行程问题" autocomplete="off" />
+          <button type="submit">发送</button>
+        </form>
+      </div>
+    </aside>
+
+    <footer>
+      <p>
+        © 2026 Italia Trip Board. 票务、开放时间和交通以官网当日信息为准。
+      </p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
