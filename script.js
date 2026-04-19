@@ -11,32 +11,36 @@ const supabaseClient =
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
 
+let memoryPhotos = [];
+let activePhotoIndex = 0;
+let activePhotoZoom = 1;
+
 const weatherCities = [
   { name: "佛罗伦萨", lat: 43.7696, lon: 11.2558 },
   { name: "威尼斯", lat: 45.4408, lon: 12.3155 },
   { name: "罗马", lat: 41.9028, lon: 12.4964 }
 ];
 
-const weatherCodeText = {
-  0: "晴",
-  1: "大致晴朗",
-  2: "局部多云",
-  3: "多云",
-  45: "有雾",
-  48: "雾凇",
-  51: "小毛毛雨",
-  53: "毛毛雨",
-  55: "较强毛毛雨",
-  61: "小雨",
-  63: "中雨",
-  65: "大雨",
-  71: "小雪",
-  73: "中雪",
-  75: "大雪",
-  80: "阵雨",
-  81: "阵雨",
-  82: "强阵雨",
-  95: "雷暴"
+const weatherCodeMeta = {
+  0: { text: "晴", icon: "🌞" },
+  1: { text: "大致晴朗", icon: "🌤️" },
+  2: { text: "局部多云", icon: "⛅" },
+  3: { text: "多云", icon: "☁️" },
+  45: { text: "有雾", icon: "🌫️" },
+  48: { text: "雾凇", icon: "🌫️" },
+  51: { text: "小毛毛雨", icon: "🌦️" },
+  53: { text: "毛毛雨", icon: "🌦️" },
+  55: { text: "较强毛毛雨", icon: "🌦️" },
+  61: { text: "小雨", icon: "☔️" },
+  63: { text: "中雨", icon: "☔️" },
+  65: { text: "大雨", icon: "☔️" },
+  71: { text: "小雪", icon: "❄️" },
+  73: { text: "中雪", icon: "❄️" },
+  75: { text: "大雪", icon: "❄️" },
+  80: { text: "阵雨", icon: "🌦️" },
+  81: { text: "阵雨", icon: "🌦️" },
+  82: { text: "强阵雨", icon: "☔️" },
+  95: { text: "雷暴", icon: "⛈️" }
 };
 
 function pad(value) {
@@ -74,6 +78,7 @@ async function fetchWeather() {
     .map(
       (city) => `
         <article class="weather-card">
+          <b class="weather-icon" aria-hidden="true">⏳</b>
           <span>${city.name}</span>
           <strong>--°</strong>
           <p>正在获取天气...</p>
@@ -99,14 +104,16 @@ async function fetchWeather() {
         if (!response.ok) throw new Error("weather request failed");
         const data = await response.json();
         const current = data.current;
-        const text = weatherCodeText[current.weather_code] || "天气更新";
+        const weather = weatherCodeMeta[current.weather_code] || { text: "天气更新", icon: "🌡️" };
         cards[index].innerHTML = `
+          <b class="weather-icon" aria-hidden="true">${weather.icon}</b>
           <span>${city.name}</span>
           <strong>${Math.round(current.temperature_2m)}°C</strong>
-          <p>${text} · 风速 ${Math.round(current.wind_speed_10m)} km/h</p>
+          <p>${weather.text} · 风速 ${Math.round(current.wind_speed_10m)} km/h</p>
         `;
       } catch (error) {
         cards[index].innerHTML = `
+          <b class="weather-icon" aria-hidden="true">☁️</b>
           <span>${city.name}</span>
           <strong>--°</strong>
           <p>暂时无法获取天气，出门前再刷新一次。</p>
@@ -256,18 +263,26 @@ async function loadPhotos() {
 
   const wall = document.querySelector("#photoWall");
   if (!data.length) {
+    memoryPhotos = [];
     renderPhotoPlaceholder("云端照片墙", "第一张照片留给意大利的清晨。");
     setStatus("#photoStatus", "云端相册已连接，等待第一张照片。", "success");
     return;
   }
 
-  wall.innerHTML = data
-    .map((photo) => {
-      const publicUrl = supabaseClient.storage.from(MEMORY_BUCKET).getPublicUrl(photo.image_path).data.publicUrl;
+  memoryPhotos = data.map((photo) => ({
+    ...photo,
+    publicUrl: supabaseClient.storage.from(MEMORY_BUCKET).getPublicUrl(photo.image_path).data.publicUrl
+  }));
+
+  wall.innerHTML = memoryPhotos
+    .map((photo, index) => {
       const caption = photo.caption ? `<p>${sanitize(photo.caption)}</p>` : "";
       return `
         <article class="photo-tile">
-          <img src="${publicUrl}" alt="${sanitize(photo.caption || `${photo.uploader} 上传的旅途照片`)}" loading="lazy" />
+          <button class="photo-open" type="button" data-photo-index="${index}" aria-label="打开 ${sanitize(photo.caption || `${photo.uploader} 上传的旅途照片`)}">
+            <img src="${photo.publicUrl}" alt="${sanitize(photo.caption || `${photo.uploader} 上传的旅途照片`)}" loading="lazy" />
+          </button>
+          <button class="photo-delete" type="button" data-delete-photo="${index}" aria-label="删除这张照片">删除</button>
           <div class="photo-meta">
             <strong>${sanitize(photo.uploader || "朋友")}</strong>
             <span>${formatMemoryDate(photo.created_at)}</span>
@@ -278,6 +293,92 @@ async function loadPhotos() {
     })
     .join("");
   setStatus("#photoStatus", `已同步 ${data.length} 张云端照片。`, "success");
+}
+
+async function deletePhoto(index, button) {
+  const photo = memoryPhotos[index];
+  if (!photo || !supabaseClient) return;
+
+  const confirmed = window.confirm("确定删除这张照片吗？删除后，所有打开这个网站的人都看不到它。");
+  if (!confirmed) return;
+
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "删除中";
+  setStatus("#photoStatus", "正在删除这张云端照片...", "muted");
+
+  try {
+    const { error: tableError } = await supabaseClient.from("trip_photos").delete().eq("id", photo.id);
+    if (tableError) throw tableError;
+
+    const { error: storageError } = await supabaseClient.storage.from(MEMORY_BUCKET).remove([photo.image_path]);
+    if (storageError) {
+      setStatus("#photoStatus", "照片已从墙上删除；原图文件清理稍后再试。", "success");
+    } else {
+      setStatus("#photoStatus", "照片已经从云端相册删除。", "success");
+    }
+
+    if (document.querySelector("#photoLightbox").classList.contains("open")) {
+      closePhotoLightbox();
+    }
+    await loadPhotos();
+  } catch (error) {
+    setStatus("#photoStatus", `删除失败：${error.message}`, "error");
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
+function renderPhotoLightbox() {
+  const photo = memoryPhotos[activePhotoIndex];
+  if (!photo) return;
+
+  const image = document.querySelector("#lightboxImage");
+  const caption = document.querySelector("#lightboxCaption");
+  const counter = document.querySelector("#lightboxCounter");
+  const zoom = Math.round(activePhotoZoom * 100);
+
+  image.src = photo.publicUrl;
+  image.alt = photo.caption || `${photo.uploader || "朋友"} 上传的旅途照片`;
+  image.style.transform = `scale(${activePhotoZoom})`;
+  caption.innerHTML = `
+    <strong>${sanitize(photo.uploader || "朋友")}</strong>
+    <span>${formatMemoryDate(photo.created_at)} · ${zoom}%</span>
+    ${photo.caption ? `<p>${sanitize(photo.caption)}</p>` : ""}
+  `;
+  counter.textContent = `${activePhotoIndex + 1} / ${memoryPhotos.length}`;
+}
+
+function openPhotoLightbox(index) {
+  if (!memoryPhotos.length) return;
+  activePhotoIndex = Math.max(0, Math.min(index, memoryPhotos.length - 1));
+  activePhotoZoom = 1;
+  const lightbox = document.querySelector("#photoLightbox");
+  lightbox.classList.add("open");
+  lightbox.setAttribute("aria-hidden", "false");
+  document.body.classList.add("lightbox-active");
+  renderPhotoLightbox();
+}
+
+function closePhotoLightbox() {
+  const lightbox = document.querySelector("#photoLightbox");
+  lightbox.classList.remove("open");
+  lightbox.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("lightbox-active");
+}
+
+function movePhotoLightbox(step) {
+  if (!memoryPhotos.length) return;
+  activePhotoIndex = (activePhotoIndex + step + memoryPhotos.length) % memoryPhotos.length;
+  activePhotoZoom = 1;
+  renderPhotoLightbox();
+}
+
+function changePhotoZoom(action) {
+  if (action === "in") activePhotoZoom = Math.min(3, activePhotoZoom + 0.25);
+  if (action === "out") activePhotoZoom = Math.max(0.75, activePhotoZoom - 0.25);
+  if (action === "reset") activePhotoZoom = 1;
+  renderPhotoLightbox();
 }
 
 async function handlePhotos(files) {
@@ -384,7 +485,7 @@ function startMemoryRealtime() {
   if (!supabaseClient) return;
   supabaseClient
     .channel("italy-memory-wall")
-    .on("postgres_changes", { event: "INSERT", schema: "public", table: "trip_photos" }, loadPhotos)
+    .on("postgres_changes", { event: "*", schema: "public", table: "trip_photos" }, loadPhotos)
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "trip_messages" }, renderMessages)
     .subscribe();
 }
@@ -505,6 +606,63 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.querySelector("#photoInput").addEventListener("change", async (event) => {
     await handlePhotos(event.target.files);
+  });
+  document.querySelector("#photoWall").addEventListener("click", async (event) => {
+    const deleteButton = event.target.closest("[data-delete-photo]");
+    if (deleteButton) {
+      await deletePhoto(Number(deleteButton.dataset.deletePhoto), deleteButton);
+      return;
+    }
+
+    const openButton = event.target.closest("[data-photo-index]");
+    if (openButton) {
+      openPhotoLightbox(Number(openButton.dataset.photoIndex));
+    }
+  });
+  document.querySelector("#lightboxClose").addEventListener("click", closePhotoLightbox);
+  document.querySelectorAll("[data-photo-step]").forEach((button) => {
+    button.addEventListener("click", () => movePhotoLightbox(Number(button.dataset.photoStep)));
+  });
+  document.querySelectorAll("[data-photo-zoom]").forEach((button) => {
+    button.addEventListener("click", () => changePhotoZoom(button.dataset.photoZoom));
+  });
+  document.querySelector("#lightboxImage").addEventListener("dblclick", () => {
+    activePhotoZoom = activePhotoZoom > 1 ? 1 : 1.75;
+    renderPhotoLightbox();
+  });
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+  document.querySelector("#lightboxFrame").addEventListener(
+    "touchstart",
+    (event) => {
+      const touch = event.changedTouches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    },
+    { passive: true }
+  );
+  document.querySelector("#lightboxFrame").addEventListener(
+    "touchend",
+    (event) => {
+      const touch = event.changedTouches[0];
+      const diffX = touch.clientX - touchStartX;
+      const diffY = touch.clientY - touchStartY;
+      if (Math.abs(diffX) > 48 && Math.abs(diffX) > Math.abs(diffY)) {
+        movePhotoLightbox(diffX < 0 ? 1 : -1);
+      }
+    },
+    { passive: true }
+  );
+  document.addEventListener("keydown", (event) => {
+    const lightbox = document.querySelector("#photoLightbox");
+    if (!lightbox.classList.contains("open")) return;
+    if (event.key === "Escape") closePhotoLightbox();
+    if (event.key === "ArrowLeft") movePhotoLightbox(-1);
+    if (event.key === "ArrowRight") movePhotoLightbox(1);
+    if (event.key === "+" || event.key === "=") changePhotoZoom("in");
+    if (event.key === "-") changePhotoZoom("out");
+    if (event.key === "0") changePhotoZoom("reset");
   });
 
   document.querySelector("#guestForm").addEventListener("submit", async (event) => {

@@ -337,7 +337,7 @@
                 照片备注
                 <input id="photoCaption" type="text" maxlength="220" placeholder="一句话记录这一刻，可不填" />
               </label>
-              <p>单张照片最多 5MB。较大的 JPG / PNG / WebP 会自动压缩后上传。</p>
+              <p>单张照片最多 5MB。点照片可放大浏览、左右滑动；删除会从所有人的云端照片墙移除。</p>
               <p class="memory-status" id="photoStatus" role="status">云端相册正在连接...</p>
             </div>
             <div class="photo-wall" id="photoWall">
@@ -365,6 +365,24 @@
           </div>
         </div>
       </section>
+
+      <div class="photo-lightbox" id="photoLightbox" role="dialog" aria-label="照片浏览器" aria-hidden="true">
+        <button class="lightbox-close" id="lightboxClose" type="button" aria-label="关闭照片浏览">×</button>
+        <button class="lightbox-nav prev" type="button" data-photo-step="-1" aria-label="上一张照片">‹</button>
+        <figure class="lightbox-stage">
+          <div class="lightbox-frame" id="lightboxFrame">
+            <img id="lightboxImage" src="" alt="" />
+          </div>
+          <figcaption id="lightboxCaption"></figcaption>
+          <div class="lightbox-tools" aria-label="照片缩放控制">
+            <button type="button" data-photo-zoom="out">缩小</button>
+            <button type="button" data-photo-zoom="reset">还原</button>
+            <button type="button" data-photo-zoom="in">放大</button>
+          </div>
+          <span class="lightbox-counter" id="lightboxCounter"></span>
+        </figure>
+        <button class="lightbox-nav next" type="button" data-photo-step="1" aria-label="下一张照片">›</button>
+      </div>
     </main>
 
     <aside class="guide-widget" aria-label="AI 随身导游">
