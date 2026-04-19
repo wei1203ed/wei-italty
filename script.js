@@ -22,7 +22,7 @@ const weatherCities = [
 ];
 
 const weatherCodeMeta = {
-  0: { text: "晴", icon: "🌞" },
+  0: { text: "晴", icon: "☀️" },
   1: { text: "大致晴朗", icon: "🌤️" },
   2: { text: "局部多云", icon: "⛅" },
   3: { text: "多云", icon: "☁️" },
