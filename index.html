@@ -19,7 +19,7 @@
         <div class="nav-links">
           <a href="#dashboard">总览</a>
           <a href="#cities">城市</a>
-          <a href="#planner">攻略</a>
+          <a href="#stay">住宿</a>
           <a href="#memory">回忆</a>
         </div>
         <button class="share-btn" id="shareBtn" type="button">分享</button>
@@ -78,45 +78,121 @@
           <strong>FCO 入境后直接火车去佛罗伦萨</strong>
         </article>
         <article class="metric">
-          <span>优先预订</span>
-          <strong>乌菲兹、学院、斗兽场、梵蒂冈</strong>
+          <span>航班平台</span>
+          <strong>Delta · JFK / DTW 转机</strong>
         </article>
       </section>
 
-      <section class="flight-card" aria-label="航班与城市移动">
+      <section class="flight-card" aria-label="航班信息">
         <div class="flight-top">
           <div>
             <p class="eyebrow">Flight Board</p>
-            <h2>跨洋航线</h2>
+            <h2>航班摘要和在线查询</h2>
           </div>
-          <div class="toggle-group" aria-label="切换去程返程">
-            <button class="toggle active" type="button" data-flight="outbound">去程</button>
-            <button class="toggle" type="button" data-flight="return">返程</button>
-          </div>
+          <span class="live-chip">Static summary · live links</span>
         </div>
 
-        <div class="flight-main">
+        <div class="flight-list">
+          <article class="flight-route-card">
+            <div class="route-head">
+              <span>Outbound · Apr 29</span>
+              <strong>YYZ → FCO</strong>
+            </div>
+            <p class="flight-time">Apr 29, 12:09 p.m. → Apr 30, 7:55 a.m.</p>
+            <dl class="flight-facts">
+              <div>
+                <dt>Airline</dt>
+                <dd>Delta</dd>
+              </div>
+              <div>
+                <dt>Connection</dt>
+                <dd>via JFK</dd>
+              </div>
+              <div>
+                <dt>Arrival plan</dt>
+                <dd>FCO 后转火车去佛罗伦萨</dd>
+              </div>
+            </dl>
+            <div class="action-row">
+              <a href="https://www.delta.com/flight-status/search" target="_blank" rel="noreferrer">Live flight status</a>
+              <a href="https://www.flightaware.com/live/findflight?origin=YYZ&destination=FCO" target="_blank" rel="noreferrer">Track flight</a>
+              <a href="https://www.torontopearson.com/en/departures" target="_blank" rel="noreferrer">Check departure terminal</a>
+            </div>
+          </article>
+
+          <article class="flight-route-card">
+            <div class="route-head">
+              <span>Return · May 8</span>
+              <strong>FCO → YYZ</strong>
+            </div>
+            <p class="flight-time">May 8, 9:00 a.m. → 5:21 p.m.</p>
+            <dl class="flight-facts">
+              <div>
+                <dt>Airline</dt>
+                <dd>Delta</dd>
+              </div>
+              <div>
+                <dt>Connection</dt>
+                <dd>via DTW</dd>
+              </div>
+              <div>
+                <dt>Departure plan</dt>
+                <dd>早上从罗马出发，机场时间留足</dd>
+              </div>
+            </dl>
+            <div class="action-row">
+              <a href="https://www.delta.com/flight-status/search" target="_blank" rel="noreferrer">Live flight status</a>
+              <a href="https://www.flightaware.com/live/findflight?origin=FCO&destination=YYZ" target="_blank" rel="noreferrer">Track flight</a>
+              <a href="https://www.adr.it/web/aeroporti-di-roma-en/pax-fco-flight-info" target="_blank" rel="noreferrer">Check departure terminal</a>
+            </div>
+          </article>
+        </div>
+        <p class="flight-note">航班状态、登机口和航站楼以 Delta 与机场当天信息为准。</p>
+      </section>
+
+      <section class="stay-section" id="stay" aria-label="住宿信息">
+        <div class="section-heading">
           <div>
-            <span class="board-label" id="flightLabel">Apr 29 - Apr 30</span>
-            <h3 id="flightTitle">多伦多出发，经纽约转机飞罗马</h3>
-            <p id="flightNote">
-              抵达 FCO 后直接转火车去佛罗伦萨，第一天不用硬塞罗马景点。
-            </p>
-          </div>
-          <div class="airport-line" aria-label="航线路线">
-            <span id="originCode">YYZ</span>
-            <i></i>
-            <span id="midCode">NYC</span>
-            <i></i>
-            <span id="destCode">FCO</span>
+            <p class="eyebrow">Stay Desk</p>
+            <h2>住宿地址和快速入口</h2>
           </div>
         </div>
+        <div class="stay-grid">
+          <article class="stay-card">
+            <span>Florence</span>
+            <h3>Home in Florence</h3>
+            <p>Apr 30 – May 3</p>
+            <address>Via del Leone, 3, Florence</address>
+            <div class="action-row">
+              <a href="https://www.airbnb.com/s/Florence--Italy/homes?query=Via%20del%20Leone%2C%203%2C%20Florence%2C%20Italy" target="_blank" rel="noreferrer">Open Airbnb</a>
+              <a href="https://www.google.com/maps/search/?api=1&query=Via%20del%20Leone%2C%203%2C%20Florence%2C%20Italy" target="_blank" rel="noreferrer">Open in Maps</a>
+              <button type="button" data-copy-address="Via del Leone, 3, Florence">Copy address</button>
+            </div>
+          </article>
 
-        <div class="flight-progress">
-          <span>出发</span>
-          <span>转机</span>
-          <span>抵达</span>
-          <div class="progress-track"><div id="flightProgress"></div></div>
+          <article class="stay-card">
+            <span>Venice</span>
+            <h3>B&amp;B HOTEL Venezia Laguna</h3>
+            <p>May 3 – May 5</p>
+            <address>Isola Nova del Tronchetto 16, Venice</address>
+            <div class="action-row">
+              <a href="https://www.expedia.com/Hotel-Search?destination=B%26B%20HOTEL%20Venezia%20Laguna%2C%20Isola%20Nova%20del%20Tronchetto%2016%2C%20Venice" target="_blank" rel="noreferrer">Open Expedia</a>
+              <a href="https://www.google.com/maps/search/?api=1&query=B%26B%20HOTEL%20Venezia%20Laguna%2C%20Isola%20Nova%20del%20Tronchetto%2016%2C%20Venice%2C%20Italy" target="_blank" rel="noreferrer">Open in Maps</a>
+              <button type="button" data-copy-address="Isola Nova del Tronchetto 16, Venice">Copy address</button>
+            </div>
+          </article>
+
+          <article class="stay-card">
+            <span>Rome</span>
+            <h3>Home in Rome</h3>
+            <p>May 5 – May 8</p>
+            <address>Via Gaetano Casati, 26 interno 19, Rome</address>
+            <div class="action-row">
+              <a href="https://www.airbnb.com/s/Rome--Italy/homes?query=Via%20Gaetano%20Casati%2C%2026%20interno%2019%2C%20Rome%2C%20Italy" target="_blank" rel="noreferrer">Open Airbnb</a>
+              <a href="https://www.google.com/maps/search/?api=1&query=Via%20Gaetano%20Casati%2C%2026%20interno%2019%2C%20Rome%2C%20Italy" target="_blank" rel="noreferrer">Open in Maps</a>
+              <button type="button" data-copy-address="Via Gaetano Casati, 26 interno 19, Rome">Copy address</button>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -238,41 +314,6 @@
               <p>白天看斗兽场、古罗马广场、梵蒂冈；晚上留给万神殿、许愿池、西班牙广场和告别晚餐。</p>
             </div>
           </article>
-        </div>
-      </section>
-
-      <section class="planner-section" id="planner" aria-label="每日攻略">
-        <div class="planner-top">
-          <div>
-            <p class="eyebrow">Daily Planner</p>
-            <h2>按城市打开每日安排</h2>
-          </div>
-          <div class="tab-row" role="tablist" aria-label="城市行程">
-            <button class="city-tab active" type="button" data-city="florence">佛罗伦萨</button>
-            <button class="city-tab" type="button" data-city="venice">威尼斯</button>
-            <button class="city-tab" type="button" data-city="rome">罗马</button>
-          </div>
-        </div>
-        <div class="timeline" id="timeline"></div>
-      </section>
-
-      <section class="booking-section" aria-label="预订清单">
-        <div>
-          <p class="eyebrow">Booking Desk</p>
-          <h2>建议提前处理的票和交通</h2>
-          <p>
-            五一前后的热门城市会很满。博物馆和热门古迹尽量走官网或官方授权入口，火车票用 Trenitalia / Italo 对比时间和价格。
-          </p>
-        </div>
-        <div class="booking-grid">
-          <a href="https://tickets.duomo.firenze.it/en/" target="_blank" rel="noreferrer">Florence Duomo</a>
-          <a href="https://www.uffizi.it/en/tickets" target="_blank" rel="noreferrer">Uffizi</a>
-          <a href="https://www.galleriaaccademiafirenze.it/en/tickets/" target="_blank" rel="noreferrer">Accademia</a>
-          <a href="https://www.visitmuve.it/en/visit/tickets/" target="_blank" rel="noreferrer">Doge's Palace</a>
-          <a href="https://ticketing.colosseo.it/en" target="_blank" rel="noreferrer">Colosseum</a>
-          <a href="https://tickets.museivaticani.va/" target="_blank" rel="noreferrer">Vatican Museums</a>
-          <a href="https://www.trenitalia.com/en.html" target="_blank" rel="noreferrer">Trenitalia</a>
-          <a href="https://www.italotreno.com/en" target="_blank" rel="noreferrer">Italo</a>
         </div>
       </section>
 

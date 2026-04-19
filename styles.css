@@ -113,8 +113,8 @@ textarea {
 .share-btn,
 .primary-action,
 .secondary-action,
-.toggle,
-.city-tab,
+.action-row a,
+.action-row button,
 .guide-form button {
   min-height: 42px;
   border: 0;
@@ -211,12 +211,11 @@ h3 {
 .countdown-band,
 .snapshot,
 .flight-card,
+.stay-section,
 .section,
 .route-map,
 .weather-section,
 .city-gallery,
-.planner-section,
-.booking-section,
 .memory-section {
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
@@ -283,8 +282,6 @@ h3 {
 .route-map,
 .weather-card,
 .city-card,
-.timeline-item,
-.booking-section,
 .guestbook,
 .placeholder-photo,
 .photo-tile {
@@ -300,8 +297,9 @@ h3 {
 }
 
 .metric span,
-.board-label,
-.city-card span {
+.city-card span,
+.route-head span,
+.stay-card span {
   display: block;
   color: var(--muted);
   font-size: 12px;
@@ -322,7 +320,6 @@ h3 {
 }
 
 .flight-top,
-.planner-top,
 .section-heading,
 .route-heading {
   display: flex;
@@ -346,105 +343,133 @@ h3 {
   font-size: 28px;
 }
 
-.toggle-group,
-.tab-row {
+.live-chip {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.flight-list {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.flight-route-card,
+.stay-card {
+  background: #f7faf5;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 12px 34px rgba(23, 32, 27, 0.06);
+}
+
+.flight-route-card {
+  padding: 20px;
+}
+
+.route-head {
+  min-height: 78px;
   display: flex;
-  gap: 8px;
-  padding: 4px;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
 }
 
-.toggle,
-.city-tab {
-  padding: 8px 14px;
-  background: transparent;
-  color: inherit;
+.route-head strong {
+  font-size: 34px;
+  line-height: 0.95;
 }
 
-.toggle.active,
-.city-tab.active {
-  color: var(--ink);
-  background: #fff;
-}
-
-.flight-main {
-  min-height: 205px;
-  padding: 28px 24px;
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 24px;
-  align-items: center;
-}
-
-.flight-main h3 {
-  margin-top: 8px;
-  font-size: 28px;
-}
-
-.flight-main p {
+.flight-time {
   margin: 10px 0 0;
-  color: var(--muted);
-}
-
-.airport-line {
-  min-height: 110px;
-  display: grid;
-  grid-template-columns: auto 1fr auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-}
-
-.airport-line span {
-  min-width: 76px;
-  min-height: 76px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: #edf7f2;
-  border: 1px solid #bcd8ca;
-  color: var(--green);
-  font-size: 24px;
+  color: var(--ink);
+  font-size: 18px;
   font-weight: 900;
 }
 
-.airport-line i {
-  height: 3px;
-  background: linear-gradient(90deg, var(--green), var(--red));
+.flight-facts {
+  margin: 16px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.flight-facts div {
+  min-height: 82px;
+  padding: 10px;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid var(--line);
   border-radius: 8px;
 }
 
-.flight-progress {
-  padding: 0 24px 24px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+.flight-facts dt {
   color: var(--muted);
   font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.flight-facts dd {
+  margin: 0;
   font-weight: 800;
 }
 
-.progress-track {
-  grid-column: 1 / -1;
-  height: 9px;
-  background: #edf0e9;
-  border-radius: 8px;
-  overflow: hidden;
+.action-row {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.progress-track div {
-  height: 100%;
-  width: 34%;
-  background: linear-gradient(90deg, var(--green), var(--gold), var(--red));
-  transition: width 0.3s ease;
+.action-row a,
+.action-row button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.action-row a:nth-child(2) {
+  color: var(--ink);
+  background: var(--gold);
+}
+
+.action-row a:nth-child(3),
+.action-row button {
+  background: var(--red);
+}
+
+.flight-note {
+  margin: 0 24px 24px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .section,
 .route-map,
 .weather-section,
 .city-gallery,
-.planner-section,
-.booking-section,
+.stay-section,
 .memory-section {
   margin-top: 86px;
 }
@@ -456,7 +481,6 @@ h3 {
 }
 
 .split p,
-.booking-section p,
 footer p {
   max-width: 720px;
   color: var(--muted);
@@ -611,124 +635,39 @@ footer p {
   color: var(--muted);
 }
 
-.planner-section {
-  padding-top: 10px;
-}
-
-.planner-top {
-  margin-bottom: 22px;
-}
-
-.tab-row {
-  background: #e8eee4;
-}
-
-.city-tab {
-  color: var(--muted);
-}
-
-.city-tab.active {
-  color: #fff;
-  background: var(--red);
-}
-
-.timeline {
+.stay-grid {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
-.timeline-item {
-  display: grid;
-  grid-template-columns: 140px 1fr auto;
-  gap: 18px;
-  align-items: start;
+.stay-card {
+  min-height: 282px;
   padding: 20px;
-}
-
-.timeline-date {
-  min-height: 100%;
-  padding-right: 14px;
-  border-right: 1px solid var(--line);
-}
-
-.timeline-date strong {
-  display: block;
-  font-size: 18px;
-}
-
-.timeline-date span {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.timeline-body p {
-  margin: 8px 0 0;
-  color: var(--muted);
-}
-
-.tips {
-  margin-top: 12px;
-  padding: 12px;
-  background: #fff8df;
-  border-left: 4px solid var(--gold);
-  border-radius: 8px;
-  color: #584b25;
-  font-size: 14px;
-}
-
-.timeline-actions {
-  min-width: 140px;
-  display: grid;
-  gap: 8px;
-}
-
-.timeline-actions a {
-  min-height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: #fff;
-  background: var(--green);
-  font-size: 13px;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.timeline-actions a:nth-child(2) {
-  background: var(--red);
-}
-
-.booking-section {
-  padding: 28px;
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 26px;
-  align-items: start;
-}
-
-.booking-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.booking-grid a {
-  min-height: 54px;
   display: flex;
-  align-items: center;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #f7faf5;
-  color: var(--ink);
-  font-weight: 900;
-  text-decoration: none;
+  flex-direction: column;
 }
 
-.booking-grid a:hover {
-  border-color: var(--green);
+.stay-card h3 {
+  margin-top: 10px;
+  font-size: 26px;
+}
+
+.stay-card p {
+  margin: 0 0 12px;
+  color: var(--green);
+  font-weight: 900;
+}
+
+.stay-card address {
+  margin: 0;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.stay-card .action-row {
+  margin-top: auto;
 }
 
 .memory-grid {
@@ -1026,9 +965,8 @@ footer {
   }
 
   .countdown-band,
-  .flight-main,
+  .flight-list,
   .split,
-  .booking-section,
   .memory-grid {
     grid-template-columns: 1fr;
   }
@@ -1036,16 +974,8 @@ footer {
   .snapshot,
   .route-stage,
   .weather-grid,
-  .city-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .timeline-item {
-    grid-template-columns: 110px 1fr;
-  }
-
-  .timeline-actions {
-    grid-column: 1 / -1;
+  .city-cards,
+  .stay-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -1083,7 +1013,8 @@ footer {
   .route-stage,
   .weather-grid,
   .city-cards,
-  .booking-grid,
+  .flight-facts,
+  .stay-grid,
   .upload-panel,
   .photo-wall {
     grid-template-columns: 1fr;
@@ -1124,36 +1055,24 @@ footer {
   }
 
   .flight-top,
-  .planner-top,
   .section-heading,
   .route-heading {
     align-items: start;
     flex-direction: column;
   }
 
-  .airport-line {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  .route-head {
+    min-height: auto;
+    display: grid;
   }
 
-  .airport-line i {
-    width: 3px;
-    height: 28px;
-    justify-self: center;
+  .route-head strong {
+    font-size: 30px;
   }
 
-  .timeline-item {
-    grid-template-columns: 1fr;
-  }
-
-  .timeline-date {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-    padding: 0 0 12px;
-  }
-
-  .timeline-actions {
-    grid-template-columns: 1fr;
+  .action-row a,
+  .action-row button {
+    width: 100%;
   }
 
   .guide-widget {

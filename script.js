@@ -11,136 +11,11 @@ const supabaseClient =
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
 
-const flightData = {
-  outbound: {
-    label: "Apr 29 - Apr 30",
-    title: "多伦多出发，经纽约转机飞罗马",
-    note: "抵达 FCO 后直接转火车去佛罗伦萨，第一天不用硬塞罗马景点。",
-    codes: ["YYZ", "NYC", "FCO"],
-    progress: "34%"
-  },
-  return: {
-    label: "May 8",
-    title: "罗马返程，经底特律转机回多伦多",
-    note: "早上从罗马出发，前一晚建议住在去机场交通方便的位置。",
-    codes: ["FCO", "DTW", "YYZ"],
-    progress: "66%"
-  }
-};
-
 const weatherCities = [
   { name: "佛罗伦萨", lat: 43.7696, lon: 11.2558 },
   { name: "威尼斯", lat: 45.4408, lon: 12.3155 },
   { name: "罗马", lat: 41.9028, lon: 12.4964 }
 ];
-
-const cityPlans = {
-  florence: [
-    {
-      date: "4 月 30 日",
-      label: "抵达 + 适应时差",
-      title: "FCO 入境后坐火车去佛罗伦萨",
-      body: "到 Firenze Santa Maria Novella 后先放行李，下午轻松走圣母百花大教堂外观、共和国广场和领主广场。",
-      tip: "第一天别安排重博物馆。晚一点去米开朗基罗广场，日落会很值。",
-      map: "https://www.google.com/maps/search/?api=1&query=Piazzale+Michelangelo+Florence",
-      ticket: "https://www.trenitalia.com/en.html"
-    },
-    {
-      date: "5 月 1 日",
-      label: "乌菲兹 + 老桥",
-      title: "把文艺复兴主菜先吃掉",
-      body: "上午安排乌菲兹美术馆，下午沿阿诺河走老桥、奥特拉诺区和皮蒂宫附近的小街。",
-      tip: "乌菲兹建议预约上午早场；馆内时间很容易超过 2.5 小时。",
-      map: "https://www.google.com/maps/search/?api=1&query=Uffizi+Gallery+Florence",
-      ticket: "https://www.uffizi.it/en/tickets"
-    },
-    {
-      date: "5 月 2 日",
-      label: "大卫 + 大教堂",
-      title: "学院美术馆、穹顶或钟楼",
-      body: "早上看学院美术馆的《大卫》，之后根据体力选圣母百花大教堂穹顶、乔托钟楼或中央市场。",
-      tip: "穹顶名额紧，能订就提前订；如果没有票，外观和周边广场也足够好看。",
-      map: "https://www.google.com/maps/search/?api=1&query=Galleria+dell%27Accademia+Firenze",
-      ticket: "https://www.galleriaaccademiafirenze.it/en/tickets/"
-    },
-    {
-      date: "5 月 3 日早上",
-      label: "北上威尼斯",
-      title: "佛罗伦萨到威尼斯",
-      body: "上午从 Firenze SMN 出发去 Venezia Santa Lucia。抵达后先别急着坐船，出站那一眼的大运河就是开场。",
-      tip: "高铁票看 Trenitalia 和 Italo 两边；行李多的话优先选少换乘。",
-      map: "https://www.google.com/maps/dir/Florence/Venice/",
-      ticket: "https://www.italotreno.com/en"
-    }
-  ],
-  venice: [
-    {
-      date: "5 月 3 日",
-      label: "抵达水城",
-      title: "里亚托桥、大运河和 cicchetti",
-      body: "入住后沿着小巷往里亚托桥方向走，傍晚找 bacaro 吃 cicchetti，再看大运河夜色。",
-      tip: "威尼斯最好的安排常常是迷路。把地图当备份，不要每十分钟查一次。",
-      map: "https://www.google.com/maps/search/?api=1&query=Rialto+Bridge+Venice",
-      ticket: "https://actv.avmspa.it/en/content/actv-fares"
-    },
-    {
-      date: "5 月 4 日",
-      label: "圣马可核心区",
-      title: "圣马可广场、总督宫和慢逛",
-      body: "早上趁人少去圣马可广场，白天看总督宫和叹息桥，下午在 Castello 或 Dorsoduro 放慢脚步。",
-      tip: "总督宫可以买 St. Mark's Square Museums Ticket；圣马可区午后人多，早晚体验更好。",
-      map: "https://www.google.com/maps/search/?api=1&query=Doge%27s+Palace+Venice",
-      ticket: "https://www.visitmuve.it/en/visit/tickets/"
-    },
-    {
-      date: "5 月 5 日早上",
-      label: "南下罗马",
-      title: "离开前再走一段水边",
-      body: "早起看一眼安静的运河，再从 Venezia Santa Lucia 出发去 Roma Termini。",
-      tip: "水上巴士到火车站的时间要留余量；威尼斯桥多，拖箱会比地图上看起来更慢。",
-      map: "https://www.google.com/maps/dir/Venice/Rome/",
-      ticket: "https://www.trenitalia.com/en.html"
-    }
-  ],
-  rome: [
-    {
-      date: "5 月 5 日",
-      label: "抵达罗马",
-      title: "万神殿、纳沃纳广场、许愿池夜景",
-      body: "下午到罗马后先轻松走市中心。晚上去许愿池和西班牙广场，比白天更有旅行感。",
-      tip: "罗马石板路多，第一天别把脚走废。好鞋比好相机重要。",
-      map: "https://www.google.com/maps/search/?api=1&query=Pantheon+Rome",
-      ticket: "https://www.museiitaliani.it/"
-    },
-    {
-      date: "5 月 6 日",
-      label: "古罗马日",
-      title: "斗兽场、古罗马广场、帕拉蒂尼山",
-      body: "上午安排斗兽场入场，之后把古罗马广场和帕拉蒂尼山连在一起。下午可去卡比托利欧或 Monti。",
-      tip: "斗兽场是实名和时段票，官网通常提前 30 天开放相应日期票。",
-      map: "https://www.google.com/maps/search/?api=1&query=Colosseum+Rome",
-      ticket: "https://ticketing.colosseo.it/en"
-    },
-    {
-      date: "5 月 7 日",
-      label: "梵蒂冈 + 告别晚餐",
-      title: "梵蒂冈博物馆、西斯廷礼拜堂、圣彼得",
-      body: "把梵蒂冈安排在最后一个完整白天。晚上去 Trastevere 或 Campo de' Fiori 周边吃告别晚餐。",
-      tip: "梵蒂冈博物馆官网提醒只通过 tickets.museivaticani.va 购买，注意避开相似域名。",
-      map: "https://www.google.com/maps/search/?api=1&query=Vatican+Museums",
-      ticket: "https://tickets.museivaticani.va/"
-    },
-    {
-      date: "5 月 8 日早上",
-      label: "返程",
-      title: "罗马到机场，飞回多伦多",
-      body: "早上从罗马出发，经底特律转机回多伦多。前一晚把退税、行李重量和机场交通确认好。",
-      tip: "国际航班当天不要安排景点。留出机场路上、退税和安检的缓冲。",
-      map: "https://www.google.com/maps/dir/Rome/Fiumicino+Airport/",
-      ticket: "https://www.trenitalia.com/en/services/leonardo-express.html"
-    }
-  ]
-};
 
 const weatherCodeText = {
   0: "晴",
@@ -191,50 +66,6 @@ function updateCountdown() {
   document.querySelector("#hours").textContent = pad(hours);
   document.querySelector("#minutes").textContent = pad(minutes);
   document.querySelector("#seconds").textContent = pad(seconds);
-}
-
-function switchFlight(key) {
-  const data = flightData[key];
-  document.querySelector("#flightLabel").textContent = data.label;
-  document.querySelector("#flightTitle").textContent = data.title;
-  document.querySelector("#flightNote").textContent = data.note;
-  document.querySelector("#originCode").textContent = data.codes[0];
-  document.querySelector("#midCode").textContent = data.codes[1];
-  document.querySelector("#destCode").textContent = data.codes[2];
-  document.querySelector("#flightProgress").style.width = data.progress;
-
-  document.querySelectorAll("[data-flight]").forEach((button) => {
-    button.classList.toggle("active", button.dataset.flight === key);
-  });
-}
-
-function renderTimeline(city) {
-  const container = document.querySelector("#timeline");
-  container.innerHTML = cityPlans[city]
-    .map(
-      (item) => `
-        <article class="timeline-item">
-          <div class="timeline-date">
-            <strong>${item.date}</strong>
-            <span>${item.label}</span>
-          </div>
-          <div class="timeline-body">
-            <h3>${item.title}</h3>
-            <p>${item.body}</p>
-            <div class="tips">${item.tip}</div>
-          </div>
-          <div class="timeline-actions">
-            <a href="${item.map}" target="_blank" rel="noreferrer">地图</a>
-            <a href="${item.ticket}" target="_blank" rel="noreferrer">官网</a>
-          </div>
-        </article>
-      `
-    )
-    .join("");
-
-  document.querySelectorAll("[data-city]").forEach((button) => {
-    button.classList.toggle("active", button.dataset.city === city);
-  });
 }
 
 async function fetchWeather() {
@@ -571,6 +402,14 @@ function guideAnswer(question) {
     return "优先订：乌菲兹、学院美术馆、圣母百花穹顶、总督宫、斗兽场、梵蒂冈博物馆。斗兽场留意 30 天放票，梵蒂冈只认 tickets.museivaticani.va。";
   }
 
+  if (q.includes("航班") || q.includes("飞机") || q.includes("机场") || q.includes("terminal")) {
+    return "去程：4 月 29 日 12:09 p.m. YYZ 出发，经 JFK，4 月 30 日 7:55 a.m. 到 FCO。返程：5 月 8 日 9:00 a.m. FCO 出发，经 DTW，5:21 p.m. 到 YYZ。航站楼和登机口看页面里的实时查询按钮。";
+  }
+
+  if (q.includes("酒店") || q.includes("住宿") || q.includes("地址") || q.includes("airbnb") || q.includes("expedia")) {
+    return "住宿：佛罗伦萨 Via del Leone, 3；威尼斯 B&B HOTEL Venezia Laguna, Isola Nova del Tronchetto 16；罗马 Via Gaetano Casati, 26 interno 19。页面的住宿卡可以打开地图、平台搜索并复制地址。";
+  }
+
   if (q.includes("佛罗伦萨") || q.includes("florence") || q.includes("firenze")) {
     return "佛罗伦萨建议把乌菲兹放 5 月 1 日上午，学院美术馆和大教堂放 5 月 2 日。日落去米开朗基罗广场，轻松又出片。";
   }
@@ -603,6 +442,31 @@ function addGuideMessage(text, isUser = false) {
   log.scrollTop = log.scrollHeight;
 }
 
+async function copyAddress(button) {
+  const address = button.dataset.copyAddress;
+  if (!address) return;
+
+  try {
+    await navigator.clipboard.writeText(address);
+  } catch (error) {
+    const textarea = document.createElement("textarea");
+    textarea.value = address;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+
+  const originalText = button.textContent;
+  button.textContent = "Copied";
+  window.setTimeout(() => {
+    button.textContent = originalText;
+  }, 1500);
+}
+
 async function shareTrip() {
   const shareData = {
     title: "意大利行程 | Florence Venice Rome",
@@ -631,12 +495,8 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCountdown();
   window.setInterval(updateCountdown, 1000);
 
-  document.querySelectorAll("[data-flight]").forEach((button) => {
-    button.addEventListener("click", () => switchFlight(button.dataset.flight));
-  });
-
-  document.querySelectorAll("[data-city]").forEach((button) => {
-    button.addEventListener("click", () => renderTimeline(button.dataset.city));
+  document.querySelectorAll("[data-copy-address]").forEach((button) => {
+    button.addEventListener("click", () => copyAddress(button));
   });
 
   document.querySelector("#weatherRefresh").addEventListener("click", fetchWeather);
@@ -690,8 +550,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelector("#shareBtn").addEventListener("click", shareTrip);
 
-  switchFlight("outbound");
-  renderTimeline("florence");
   renderMessages();
   loadPhotos();
   startMemoryRealtime();
