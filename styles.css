@@ -215,6 +215,7 @@ h3 {
 .countdown-band,
 .snapshot,
 .flight-card,
+.italy-time-section,
 .stay-section,
 .section,
 .route-map,
@@ -285,6 +286,7 @@ h3 {
 .flight-card,
 .route-map,
 .weather-card,
+.time-card,
 .city-card,
 .guestbook,
 .placeholder-photo,
@@ -367,6 +369,46 @@ h3 {
   gap: 14px;
 }
 
+.flight-status-panel {
+  padding: 18px 24px 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.flight-status-panel article {
+  min-height: 104px;
+  padding: 14px;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.flight-status-panel span,
+.segment-item span,
+.clock-sync,
+.time-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.flight-status-panel strong {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.flight-status-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .flight-route-card,
 .stay-card {
   background: #f7faf5;
@@ -429,6 +471,35 @@ h3 {
   font-weight: 800;
 }
 
+.segment-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.segment-item {
+  min-height: 72px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 0.8fr 1fr;
+  gap: 4px 12px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.segment-item strong {
+  font-size: 20px;
+}
+
+.segment-item time {
+  grid-column: 1 / -1;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+}
+
 .action-row {
   margin-top: 16px;
   display: flex;
@@ -460,6 +531,12 @@ h3 {
 .action-row a:nth-child(3),
 .action-row button {
   background: var(--red);
+}
+
+.action-row a:nth-child(4) {
+  color: var(--ink);
+  background: #e9efe6;
+  border: 1px solid var(--line);
 }
 
 .flight-note {
@@ -584,6 +661,52 @@ footer p {
   padding: 10px 16px;
   color: #fff;
   background: var(--green);
+}
+
+.italy-time-section {
+  margin-top: 24px;
+}
+
+.clock-sync {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.time-card {
+  min-height: 178px;
+  padding: 20px;
+  display: grid;
+  align-content: space-between;
+  gap: 12px;
+  background: #fff;
+}
+
+.time-card strong {
+  font-family: "Courier New", monospace;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.time-card p,
+.time-card small {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.time-card small {
+  font-size: 13px;
 }
 
 .weather-grid {
@@ -1119,6 +1242,7 @@ footer {
 
   .countdown-band,
   .flight-list,
+  .flight-status-panel,
   .split,
   .memory-grid {
     grid-template-columns: 1fr;
@@ -1127,6 +1251,7 @@ footer {
   .snapshot,
   .route-stage,
   .weather-grid,
+  .time-grid,
   .city-cards,
   .stay-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1166,8 +1291,10 @@ footer {
   .route-stage,
   .weather-grid,
   .city-cards,
-  .flight-facts,
-  .stay-grid,
+    .flight-facts,
+    .flight-status-panel,
+    .time-grid,
+    .stay-grid,
   .upload-panel,
   .photo-wall {
     grid-template-columns: 1fr;

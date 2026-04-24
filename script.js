@@ -21,6 +21,43 @@ const weatherCities = [
   { name: "罗马", lat: 41.9028, lon: 12.4964 }
 ];
 
+const italyClockCities = [
+  { name: "罗马", label: "Rome", stay: "May 5 - May 8", timeZone: "Europe/Rome" },
+  { name: "佛罗伦萨", label: "Florence", stay: "Apr 30 - May 3", timeZone: "Europe/Rome" },
+  { name: "威尼斯", label: "Venice", stay: "May 3 - May 5", timeZone: "Europe/Rome" }
+];
+
+const flightCheckpoints = [
+  {
+    label: "DL 5098",
+    route: "YYZ → JFK",
+    start: "2026-04-29T12:09:00-04:00",
+    end: "2026-04-29T13:59:00-04:00",
+    timeZone: "America/Toronto"
+  },
+  {
+    label: "DL 182",
+    route: "JFK → FCO",
+    start: "2026-04-29T17:10:00-04:00",
+    end: "2026-04-30T07:55:00+02:00",
+    timeZone: "America/New_York"
+  },
+  {
+    label: "DL 207",
+    route: "FCO → DTW",
+    start: "2026-05-08T09:00:00+02:00",
+    end: "2026-05-08T13:16:00-04:00",
+    timeZone: "Europe/Rome"
+  },
+  {
+    label: "Delta Connection",
+    route: "DTW → YYZ",
+    start: "2026-05-08T15:50:00-04:00",
+    end: "2026-05-08T17:21:00-04:00",
+    timeZone: "America/Detroit"
+  }
+];
+
 const weatherCodeMeta = {
   0: { text: "晴", icon: "☀️" },
   1: { text: "大致晴朗", icon: "🌤️" },
@@ -45,6 +82,170 @@ const weatherCodeMeta = {
 
 function pad(value) {
   return String(value).padStart(2, "0");
+}
+
+function formatInZone(date, timeZone, options) {
+  return new Intl.DateTimeFormat("zh-CN", { timeZone, ...options }).format(date);
+}
+
+function timeZoneOffsetMinutes(timeZone, date) {
+  const values = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  })
+    .formatToParts(date)
+    .reduce((acc, part) => {
+      if (part.type !== "literal") acc[part.type] = Number(part.value);
+      return acc;
+    }, {});
+
+  const utcTime = Date.UTC(
+    values.year,
+    values.month - 1,
+    values.day,
+    values.hour,
+    values.minute,
+    values.second
+  );
+
+  return Math.round((utcTime - date.getTime()) / 60000);
+}
+
+function formatTorontoOffset(timeZone) {
+  const now = new Date();
+  const diff = timeZoneOffsetMinutes(timeZone, now) - timeZoneOffsetMinutes("America/Toronto", now);
+  const sign = diff >= 0 ? "+" : "-";
+  const hours = Math.floor(Math.abs(diff) / 60);
+  const minutes = Math.abs(diff) % 60;
+  return `比多伦多 ${sign}${hours}${minutes ? `h${pad(minutes)}` : "h"}`;
+}
+
+function formatFlightTime(date, timeZone) {
+  return formatInZone(date, timeZone, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  });
+}
+
+function formatRelative(ms) {
+  if (ms <= 0) return "现在";
+  const days = Math.floor(ms / 86400000);
+  const hours = Math.floor((ms / 3600000) % 24);
+  const minutes = Math.floor((ms / 60000) % 60);
+  if (days > 0) return `${days}天 ${hours}小时`;
+  if (hours > 0) return `${hours}小时 ${minutes}分钟`;
+  return `${Math.max(minutes, 1)}分钟`;
+}
+
+function renderClockShell() {
+  const grid = document.querySelector("#italyClockGrid");
+  if (!grid || grid.children.length) return;
+  grid.innerHTML = italyClockCities
+    .map(
+      (city) => `
+        <article class="time-card" data-clock-city="${sanitize(city.name)}">
+          <span>${sanitize(city.label)}</span>
+          <strong data-clock-time>--:--:--</strong>
+          <p data-clock-date>${sanitize(city.stay)}</p>
+          <small data-clock-offset>${formatTorontoOffset(city.timeZone)}</small>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function updateItalyClocks() {
+  renderClockShell();
+  const now = new Date();
+  const cards = document.querySelectorAll("[data-clock-city]");
+  cards.forEach((card, index) => {
+    const city = italyClockCities[index];
+    card.querySelector("[data-clock-time]").textContent = formatInZone(now, city.timeZone, {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    });
+    card.querySelector("[data-clock-date]").textContent = `${formatInZone(now, city.timeZone, {
+      month: "long",
+      day: "numeric",
+      weekday: "short"
+    })} · ${city.stay}`;
+    card.querySelector("[data-clock-offset]").textContent = formatTorontoOffset(city.timeZone);
+  });
+
+  const sync = document.querySelector("#clockSync");
+  if (sync) {
+    sync.textContent = `Europe/Rome · ${formatInZone(now, "Europe/Rome", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    })}`;
+  }
+}
+
+function updateFlightStatusPanel() {
+  const panel = document.querySelector("#flightStatusPanel");
+  if (!panel) return;
+
+  const now = new Date();
+  const next =
+    flightCheckpoints.find((checkpoint) => new Date(checkpoint.end).getTime() >= now.getTime()) ||
+    flightCheckpoints[flightCheckpoints.length - 1];
+  const start = new Date(next.start);
+  const end = new Date(next.end);
+  const isActive = now >= start && now <= end;
+  const isComplete = now > end;
+  const status = isActive ? "进行中" : isComplete ? "行程完成" : "下一段";
+  const statusText = isActive
+    ? `预计 ${formatFlightTime(end, next.timeZone)} 抵达`
+    : isComplete
+      ? "欢迎回到多伦多"
+      : `${formatRelative(start.getTime() - now.getTime())} 后出发`;
+
+  panel.innerHTML = `
+    <article>
+      <span>${status}</span>
+      <strong>${sanitize(next.label)} · ${sanitize(next.route)}</strong>
+      <p>${statusText}</p>
+    </article>
+    <article>
+      <span>Official source</span>
+      <strong>Delta / Expedia</strong>
+      <p>登机口、延误和航站楼以官网为准。</p>
+    </article>
+    <article>
+      <span>Toronto refresh</span>
+      <strong>${formatInZone(now, "America/Toronto", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      })}</strong>
+      <p>${formatInZone(now, "America/Toronto", {
+        month: "long",
+        day: "numeric",
+        weekday: "short"
+      })}</p>
+    </article>
+  `;
+
+  const stamp = document.querySelector("#flightLiveStamp");
+  if (stamp) {
+    stamp.textContent = `Auto clock · ${formatInZone(now, "America/Toronto", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    })}`;
+  }
 }
 
 function updateCountdown() {
@@ -595,6 +796,10 @@ async function shareTrip() {
 document.addEventListener("DOMContentLoaded", () => {
   updateCountdown();
   window.setInterval(updateCountdown, 1000);
+  updateItalyClocks();
+  window.setInterval(updateItalyClocks, 1000);
+  updateFlightStatusPanel();
+  window.setInterval(updateFlightStatusPanel, 60000);
 
   document.querySelectorAll("[data-copy-address]").forEach((button) => {
     button.addEventListener("click", () => copyAddress(button));

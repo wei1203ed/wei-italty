@@ -87,10 +87,12 @@
         <div class="flight-top">
           <div>
             <p class="eyebrow">Flight Board</p>
-            <h2>航班摘要和在线查询</h2>
+            <h2>航班状态和官方入口</h2>
           </div>
-          <span class="live-chip">Static summary · live links</span>
+          <span class="live-chip" id="flightLiveStamp">Official links · auto clock</span>
         </div>
+
+        <div class="flight-status-panel" id="flightStatusPanel" aria-live="polite"></div>
 
         <div class="flight-list">
           <article class="flight-route-card">
@@ -113,10 +115,23 @@
                 <dd>FCO 后转火车去佛罗伦萨</dd>
               </div>
             </dl>
+            <div class="segment-list" aria-label="去程航段">
+              <div class="segment-item">
+                <strong>DL 5098</strong>
+                <span>YYZ T3 → JFK T4</span>
+                <time datetime="2026-04-29T12:09:00-04:00">Apr 29 · 12:09 p.m. → 1:59 p.m.</time>
+              </div>
+              <div class="segment-item">
+                <strong>DL 182</strong>
+                <span>JFK T4 → FCO T3</span>
+                <time datetime="2026-04-29T17:10:00-04:00">Apr 29 · 5:10 p.m. → Apr 30 · 7:55 a.m.</time>
+              </div>
+            </div>
             <div class="action-row">
-              <a href="https://www.delta.com/flight-status/search" target="_blank" rel="noreferrer">Live flight status</a>
+              <a href="https://www.delta.com/flightstatus/search" target="_blank" rel="noreferrer">Delta status</a>
               <a href="https://www.flightaware.com/live/findflight?origin=YYZ&destination=FCO" target="_blank" rel="noreferrer">Track flight</a>
               <a href="https://www.torontopearson.com/en/departures" target="_blank" rel="noreferrer">Check departure terminal</a>
+              <a href="https://www.expedia.ca/trips" target="_blank" rel="noreferrer">Expedia trips</a>
             </div>
           </article>
 
@@ -140,14 +155,38 @@
                 <dd>早上从罗马出发，机场时间留足</dd>
               </div>
             </dl>
+            <div class="segment-list" aria-label="返程航段">
+              <div class="segment-item">
+                <strong>DL 207</strong>
+                <span>FCO → DTW</span>
+                <time datetime="2026-05-08T09:00:00+02:00">May 8 · 9:00 a.m. → 1:16 p.m.</time>
+              </div>
+              <div class="segment-item">
+                <strong>Delta Connection</strong>
+                <span>DTW → YYZ</span>
+                <time datetime="2026-05-08T15:50:00-04:00">May 8 · 3:50 p.m. → 5:21 p.m.</time>
+              </div>
+            </div>
             <div class="action-row">
-              <a href="https://www.delta.com/flight-status/search" target="_blank" rel="noreferrer">Live flight status</a>
+              <a href="https://www.delta.com/flightstatus/search" target="_blank" rel="noreferrer">Delta status</a>
               <a href="https://www.flightaware.com/live/findflight?origin=FCO&destination=YYZ" target="_blank" rel="noreferrer">Track flight</a>
               <a href="https://www.adr.it/web/aeroporti-di-roma-en/pax-fco-flight-info" target="_blank" rel="noreferrer">Check departure terminal</a>
+              <a href="https://www.delta.com/mytrips/search" target="_blank" rel="noreferrer">Delta trip</a>
             </div>
           </article>
         </div>
-        <p class="flight-note">航班状态、登机口和航站楼以 Delta 与机场当天信息为准。</p>
+        <p class="flight-note">确认号和姓名不公开保存。航班状态、登机口和航站楼以 Delta、Expedia 与机场当天信息为准。</p>
+      </section>
+
+      <section class="italy-time-section" aria-label="意大利时间">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Italy Time</p>
+            <h2>罗马、佛罗伦萨、威尼斯时间</h2>
+          </div>
+          <span class="clock-sync" id="clockSync">Europe/Rome</span>
+        </div>
+        <div class="time-grid" id="italyClockGrid"></div>
       </section>
 
       <section class="stay-section" id="stay" aria-label="住宿信息">
@@ -412,6 +451,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js?v=20260419-sun-icon"></script>
+    <script src="script.js?v=20260424-flight-time"></script>
   </body>
 </html>
